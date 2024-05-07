@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { GmailModule } from './gmail/gmail.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './ormconfig';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { EmailsModule } from './emails/emails.module';
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     }),
     TypeOrmModule.forRoot(typeOrmConfig),
     ScheduleModule.forRoot(),
-    GmailModule,
+    EmailsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

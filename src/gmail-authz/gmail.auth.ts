@@ -3,11 +3,6 @@ const path = require('path');
 const { authenticate } = require('@google-cloud/local-auth');
 const { google } = require('googleapis');
 
-// import fs from 'fs/promises';
-// import path from 'path';
-// import { authenticate } from '@google-cloud/local-auth';
-// import { google } from 'googleapis';
-
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
 // The file token.json stores the user's access and refresh tokens, and is
