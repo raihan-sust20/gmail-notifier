@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { EmailAddress } from './email-address.entity';
 
 @Entity()
 export class Email {
@@ -34,5 +35,5 @@ export class Email {
   dateUpdated: Date;
 
   @ManyToOne(() => Email, (email) => email.emailAddress)
-  emailAddress: string;
+  emailAddress: EmailAddress;
 }
