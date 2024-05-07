@@ -9,7 +9,5 @@ export const typeOrmConfig: DataSourceOptions = {
   database: env.SQLITE_DB_PATH,
   synchronize: env.TYPEORM_SYNC === 'ON',
   logging: env.TYPEORM_LOG === 'ON',
-  migrations: [
-    'dist/db/migration/*.js',
-  ],
+  migrations: ['dist/db/migration/*.js'],
 };

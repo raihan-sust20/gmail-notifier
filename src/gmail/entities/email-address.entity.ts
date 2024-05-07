@@ -1,5 +1,12 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Email } from "./email.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Email } from './email.entity';
 
 @Entity()
 export class EmailAddress {
@@ -11,6 +18,9 @@ export class EmailAddress {
 
   @Column()
   nickName: string;
+
+  @Column()
+  query: string;
 
   @CreateDateColumn()
   dateCreated: Date;
