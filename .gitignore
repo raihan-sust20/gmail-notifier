@@ -42,5 +42,6 @@ lerna-debug.log*
 # Secret Keys
 /src/gmail-authz/auth-tokens
 /auth
-# /db
+/db
+
 
