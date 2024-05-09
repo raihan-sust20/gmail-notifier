@@ -10,11 +10,11 @@ const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
 // time.
 const TOKEN_PATH = path.join(
   process.cwd(),
-  'src/gmail-authz/auth-tokens/token.json',
+  'auth/token.json',
 );
 const CREDENTIALS_PATH = path.join(
   process.cwd(),
-  'src/gmail-authz/auth-tokens/credentials.json',
+  'auth/credentials.json',
 );
 
 /**
