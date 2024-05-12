@@ -13,7 +13,7 @@ export class EmailQueryParam {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   address: string;
 
   @Column()
@@ -34,3 +34,8 @@ export class EmailQueryParam {
   @OneToMany(() => Email, (email) => email.emailQueryParam)
   emails: Email[];
 }
+
+/**
+ * refactor: rename methods and variables related to email query parameter
+ * 
+ */

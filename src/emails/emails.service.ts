@@ -4,13 +4,13 @@ import * as R from 'ramda';
 import * as BlubirdPromise from 'bluebird';
 import { DateTime, Duration } from 'luxon';
 import { google } from 'googleapis';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { authorize } from '../gmail-authz/gmail.auth';
 import { CreateEmailQueryParamDto } from './dto/create-email-query-param.dto';
 import { UpdateEmailQueryParamDto } from './dto/update-email-query-param.dto';
 import { EmailQueryParamRepositoryService } from './repositories/email-query-param-repository.service';
-import { InjectRepository } from '@nestjs/typeorm';
 import { EmailQueryParam } from './entities/email-query-param.entity';
-import { Repository } from 'typeorm';
 import { IFormatedEmailQuery } from './interfaces/email-query.interface';
 import {
   IEmailMessageMetadata,
@@ -130,13 +130,13 @@ export class EmailsService {
 
   private listEmailMessagesMetadata = async (
     gmailApiAuth: any,
-    formatedEmailQueryList: IFormatedEmailQuery[],
+    formatedEmailQueryParamList: IFormatedEmailQuery[],
   ): Promise<IGroupedEmailMessageMetadataItem[]> => {
     return BlubirdPromise.each(
-      formatedEmailQueryList,
-      async (formatedEmailQueryItem: IFormatedEmailQuery) => {
-        const qQuery = R.prop('qQuery', formatedEmailQueryItem);
-        const name = R.prop('name', formatedEmailQueryItem);
+      formatedEmailQueryParamList,
+      async (formatedEmailQueryParamItem: IFormatedEmailQuery) => {
+        const qQuery = R.prop('qQuery', formatedEmailQueryParamItem);
+        const name = R.prop('name', formatedEmailQueryParamItem);
 
         const emailMessageList = await this.listEmailMessages(
           gmailApiAuth,
@@ -159,11 +159,11 @@ export class EmailsService {
   @Cron('*/3 * * * *')
   async monitorEmails() {
     const gmailApiAuth = await authorize();
-    const formatedEmailQueryList = await this.formatEmailQueryParams();
+    const formatedEmailQueryParamList = await this.formatEmailQueryParams();
 
     const emailMessagesMetadata = await this.listEmailMessagesMetadata(
       gmailApiAuth,
-      formatedEmailQueryList,
+      formatedEmailQueryParamList,
     );
 
     /**

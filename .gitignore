@@ -43,5 +43,3 @@ lerna-debug.log*
 /src/gmail-authz/auth-tokens
 /auth
 /db
-
-

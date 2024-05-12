@@ -20,6 +20,11 @@ export class EmailQueryParamRepositoryService {
     emailQueryParam.qQuery = emailQueryParamData.qQuery;
     emailQueryParam.lastExecuted = DateTime.now().toJSDate();
 
+    /**
+     * @todo Used just for test. Must be removed for production.
+     */
+    emailQueryParam.lastExecuted = DateTime.now().minus({ months: 3}).toJSDate();
+
     return this.emailQueryParamRepository.save(emailQueryParam);
 
   }
