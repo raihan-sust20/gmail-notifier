@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import * as R from 'ramda';
+import notifier from 'node-notifier';
 import * as BlubirdPromise from 'bluebird';
 import { DateTime, Duration } from 'luxon';
 import { google } from 'googleapis';
@@ -16,6 +17,7 @@ import {
   IEmailMessageMetadata,
   IGroupedEmailMessageMetadataItem,
 } from './interfaces/email-message-metadata.interface';
+import { IEmailMessageListItem } from './interfaces/email-message-list-item.interface';
 
 @Injectable()
 export class EmailsService {
@@ -57,7 +59,10 @@ export class EmailsService {
   });
 
   fetchEmailMessageMetadata = R.curry(
-    async (auth, message: any): Promise<IEmailMessageMetadata> => {
+    async (
+      auth,
+      message: IEmailMessageListItem,
+    ): Promise<IEmailMessageMetadata> => {
       const messageId: string = R.prop('id', message);
       const gmail = google.gmail({ version: 'v1', auth });
 
@@ -87,27 +92,27 @@ export class EmailsService {
     },
   );
 
-  listEmailMessages = R.curry(async (auth, qQuery: string): Promise<any[]> => {
-    const gmail = google.gmail({ version: 'v1', auth });
-    const timestamp = this.getTimestamp({ months: 6 });
-    const res = await gmail.users.messages.list({
-      userId: 'me',
-      // q: `from:do-not-reply@ses.binance.com after:${timestamp}`,
-      q: qQuery,
-    });
+  listEmailMessages = R.curry(
+    async (auth, qQuery: string): Promise<IEmailMessageListItem[] | null> => {
+      const gmail = google.gmail({ version: 'v1', auth });
+      const timestamp = this.getTimestamp({ months: 6 });
+      const res = await gmail.users.messages.list({
+        userId: 'me',
+        // q: `from:do-not-reply@ses.binance.com after:${timestamp}`,
+        q: qQuery,
+      });
 
-    const messages = res?.data?.messages;
-    if (R.isNil(messages) || messages.length === 0) {
-      console.log('No messages found.');
-      return [];
-    }
+      const messages = res?.data?.messages;
+      if (R.isNil(messages) || messages.length === 0) {
+        console.log('No messages found.');
+        return null;
+      }
 
-    return messages;
-  });
+      return messages;
+    },
+  );
 
-  private formatEmailQueryParams = async (): Promise<
-    IFormatedEmailQuery[]
-  > => {
+  private formatEmailQueryParams = async (): Promise<IFormatedEmailQuery[]> => {
     const emailQueryParamListFromDb = await this.listEmailQueryParams();
 
     return R.map(
@@ -131,7 +136,7 @@ export class EmailsService {
   private listEmailMessagesMetadata = async (
     gmailApiAuth: any,
     formatedEmailQueryParamList: IFormatedEmailQuery[],
-  ): Promise<IGroupedEmailMessageMetadataItem[]> => {
+  ): Promise<IGroupedEmailMessageMetadataItem[] | null> => {
     return BlubirdPromise.each(
       formatedEmailQueryParamList,
       async (formatedEmailQueryParamItem: IFormatedEmailQuery) => {
@@ -143,10 +148,16 @@ export class EmailsService {
           qQuery,
         );
 
+        if (R.isNil(emailMessageList)) {
+          return null;
+        }
+
         const emailMessagesMetadata = await BlubirdPromise.each(
           emailMessageList,
           this.fetchEmailMessageMetadata(gmailApiAuth),
         );
+
+        console.log('Email message metadata method: ', emailMessagesMetadata)
 
         return {
           name,
@@ -156,15 +167,59 @@ export class EmailsService {
     );
   };
 
+  private sendDesktopNotification(
+    groupedEmailMessagesMetadata: IGroupedEmailMessageMetadataItem[],
+  ) {
+    R.forEach(
+      (groupedEmailMessagesMetadataItem: IGroupedEmailMessageMetadataItem) => {
+        const emailMessageFrom = R.prop(
+          'name',
+          groupedEmailMessagesMetadataItem,
+        );
+
+        const emailMessagesMetadata = R.pipe(
+          R.prop('emailMessagesMetadata'),
+          R.pluck('subject'),
+          R.join('\n'),
+        )(groupedEmailMessagesMetadataItem);
+
+        notifier.notify(
+          {
+            title: `Reciveed Email from ${emailMessageFrom}`,
+            message: emailMessagesMetadata,
+          },
+          function (err, response, metadata) {
+            console.log('Response: ', response);
+            console.log('Whoops! Failed to notify user.');
+            console.error(err);
+          },
+        );
+      },
+      groupedEmailMessagesMetadata,
+    );
+  }
+
   @Cron('*/3 * * * *')
   async monitorEmails() {
     const gmailApiAuth = await authorize();
     const formatedEmailQueryParamList = await this.formatEmailQueryParams();
 
-    const emailMessagesMetadata = await this.listEmailMessagesMetadata(
+    const groupedEmailMessagesMetadata = await this.listEmailMessagesMetadata(
       gmailApiAuth,
       formatedEmailQueryParamList,
     );
+
+    console.log(
+      'Grouped email message metadata from schedule: ',
+      groupedEmailMessagesMetadata,
+    );
+
+    const filteredEmailMessagesMetadata = R.reject(
+      R.isNil,
+      groupedEmailMessagesMetadata,
+    );
+
+    this.sendDesktopNotification(filteredEmailMessagesMetadata);
 
     /**
      * Update lastExecuted prop of EmailQueryParam entity
