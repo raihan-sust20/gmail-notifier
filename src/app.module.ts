@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './ormconfig';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
-import { EmailsModule } from './emails/emails.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { EmailsModule } from './emails/emails.module';
     }),
     TypeOrmModule.forRoot(typeOrmConfig),
     ScheduleModule.forRoot(),
-    EmailsModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

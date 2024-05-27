@@ -15,7 +15,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Email Notifier API')
-    .setDescription('Notify user about emails from intended email address')
+    .setDescription('Notify user about email from intended email address')
     .setVersion('1.0')
     .addTag('gmail')
     .build();

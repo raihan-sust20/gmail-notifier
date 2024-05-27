@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { EmailsService } from './emails.service';
-import { EmailsController } from './emails.controller';
+import { EmailService } from './email.service';
+import { EmailController } from './email.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmailQueryParam } from './entities/email-query-param.entity';
 import { EmailQueryParamRepositoryService } from './repositories/email-query-param-repository.service';
@@ -8,8 +8,8 @@ import { Email } from './entities/email.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([EmailQueryParam, Email])],
-  controllers: [EmailsController],
-  providers: [EmailsService, EmailQueryParamRepositoryService],
-  exports: [EmailsService, EmailQueryParamRepositoryService, TypeOrmModule],
+  controllers: [EmailController],
+  providers: [EmailService, EmailQueryParamRepositoryService],
+  exports: [EmailService, EmailQueryParamRepositoryService, TypeOrmModule],
 })
-export class EmailsModule {}
+export class EmailModule {}
