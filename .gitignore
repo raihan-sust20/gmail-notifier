@@ -42,4 +42,9 @@ lerna-debug.log*
 # Secret Keys
 /src/gmail-authz/auth-tokens
 /auth
+
+# Database and Migrations
 /db
+/src/db
+# Systemd Unit
+email-notifier.service

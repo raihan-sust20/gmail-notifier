@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as dotenv from 'dotenv';
+import * as R from 'ramda';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 const env: any = dotenv.parse(fs.readFileSync('.env'));
@@ -10,5 +11,5 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   synchronize: env.TYPEORM_SYNC === 'ON',
   logging: env.TYPEORM_LOG === 'ON',
   autoLoadEntities: true,
-  migrations: ['dist/db/migration/*.js'],
+  migrations: ['db/migrations/*.ts'],
 };
