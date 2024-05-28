@@ -1,0 +1,10 @@
+[Unit]
+Description=Notify user about email message recieved from intended email address
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/node dist/main
+WorkingDirectory=<absolute-path-to-project-direcotory>
+
+[Install]
+WantedBy=default.target

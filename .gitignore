@@ -46,5 +46,7 @@ lerna-debug.log*
 # Database and Migrations
 /db
 /src/db
+/src/data-source-config.ts
+
 # Systemd Unit
 email-notifier.service
