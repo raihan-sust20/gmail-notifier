@@ -288,7 +288,7 @@ export class EmailService {
       );
 
       /**
-       * Update lastExecuted prop of EmailQueryParam entity
+       * @todo Update lastExecuted prop of EmailQueryParam entity
        */
     } catch (error) {
       console.log('Whoops! Something went wrong.');

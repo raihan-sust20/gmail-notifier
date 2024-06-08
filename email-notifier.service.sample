@@ -3,7 +3,8 @@ Description=Notify user about email message recieved from intended email address
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/node dist/main
+USER=<who_am_i>
+ExecStart=<node_bin_directory> dist/main
 WorkingDirectory=<absolute-path-to-project-direcotory>
 
 [Install]
