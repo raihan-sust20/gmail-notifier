@@ -18,6 +18,7 @@ import {
   IGroupedEmailMessageMetadataItem,
 } from './interfaces/email-message-metadata.interface';
 import { IEmailMessageListItem } from './interfaces/email-message-list-item.interface';
+import { trace } from '../utils/fp';
 
 @Injectable()
 export class EmailService {
@@ -210,13 +211,13 @@ export class EmailService {
             title: `Reciveed Email from ${emailMessageFrom}`,
             message: emailMessagesMetadata,
           },
-          function (err, response, metadata) {
+          function (err: any, response: any, metadata: any) {
             if (R.isNotNil(response)) {
               console.log('Response: ', response);
             }
             if (R.isNotNil(err)) {
               console.log('Whoops! Failed to notify user.');
-              console.error(err);
+              console.log(err);
             }
           },
         );
@@ -225,7 +226,36 @@ export class EmailService {
     );
   }
 
-  @Cron('*/3 * * * *')
+  private async updateLastExecutionTimeInDb(
+    groupedEmailMessagesMetadata: IGroupedEmailMessageMetadataItem[],
+  ) {
+    const emailAddressList: string[] = R.pipe(
+      R.pluck('emailMessagesMetadata'),
+      // trace('Email messages metadata'),
+      R.flatten,
+      // trace('flattened email messages metadata'),
+      R.pluck('from'),
+      R.map((emailAddressItem: string) => {
+        return R.pipe(
+          R.split(' '),
+          trace('Splitted email: '),
+          R.nth(1),
+          trace('2nd element: '),
+          R.slice(1, -1),
+        )(emailAddressItem);
+      }),
+    )(groupedEmailMessagesMetadata);
+
+    console.log('Email address list: ', emailAddressList);
+    this.emailQueryParamRepositoryService.updateEmailQueryParam(
+      { lastExecuted: DateTime.now().toJSDate() },
+      emailAddressList,
+    );
+
+    // await BluebirdPromise.each(emailAddressList, this.)
+  }
+
+  @Cron('*/2 * * * *')
   async monitorEmail() {
     try {
       const gmailApiAuth = await authorize();
@@ -250,6 +280,12 @@ export class EmailService {
       );
 
       this.sendDesktopNotification(filteredEmailMessagesMetadata);
+
+      // this.updateLastExecutionTimeInDb(groupedEmailMessagesMetadata);
+      this.emailQueryParamRepositoryService.updateEmailQueryParam(
+        { lastExecuted: DateTime.now().toJSDate() },
+        null,
+      );
 
       /**
        * Update lastExecuted prop of EmailQueryParam entity

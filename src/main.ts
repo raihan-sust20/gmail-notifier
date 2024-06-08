@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger';
+import 'dotenv/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,15 +16,17 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Email Notifier API')
-    .setDescription('Notify user about email from intended email address')
-    .setVersion('1.0')
+    .setDescription('Notify user about email message recieved from predefined email address')
+    .setVersion('0.0.1')
     .addTag('gmail')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/doc', app, document);
 
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(3000);
+  await app.listen(process.env.PORT);
+
+  console.log('API is listening on port ', process.env.PORT);
 }
 
 bootstrap();
