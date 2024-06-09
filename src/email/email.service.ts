@@ -42,16 +42,27 @@ export class EmailService {
     return this.emailQueryParamRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} email`;
+  async getEmailQueryParam(address: string) {
+    return this.emailQueryParamRepository.find({
+      where: {
+        address,
+      },
+    });
   }
 
-  update(id: number, updateEmailDto: UpdateEmailQueryParamDto) {
-    return `This action updates a #${id} email`;
+  async update(address: string, updateEmailQueryParamDto: UpdateEmailQueryParamDto) {
+    return this.emailQueryParamRepositoryService.updateEmailQueryParam(
+      updateEmailQueryParamDto,
+      [address],
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} email`;
+  async remove(address: string) {
+    return this.emailQueryParamRepository
+      .createQueryBuilder()
+      .delete()
+      .where('address = :address', { address })
+      .execute();
   }
 
   private getTimestamp = R.curry((duration: Duration): number => {

@@ -21,22 +21,25 @@ export class EmailController {
   }
 
   @Get('query-params')
-  findAll() {
+  listEmailQueryParams() {
     return this.emailServicService.listEmailQueryParams();
   }
 
-  @Get('query-params/:id')
-  findOne(@Param('id') id: string) {
-    return this.emailServicService.findOne(+id);
+  @Get('query-params/:address')
+  getEmailQueryParams(@Param('address') address: string) {
+    return this.emailServicService.getEmailQueryParams(address);
   }
 
-  @Patch('query-params/:id')
-  update(@Param('id') id: string, @Body() updateEmailDto: UpdateEmailQueryParamDto) {
-    return this.emailServicService.update(+id, updateEmailDto);
+  @Patch('query-params/:address')
+  update(
+    @Param('address') address: string,
+    @Body() updateEmailQueryParamDto: UpdateEmailQueryParamDto,
+  ) {
+    return this.emailServicService.update(address, updateEmailQueryParamDto);
   }
 
-  @Delete('query-paramms/:id')
-  remove(@Param('id') id: string) {
-    return this.emailServicService.remove(+id);
+  @Delete('query-paramms/:address')
+  remove(@Param('address') address: string) {
+    return this.emailServicService.remove(address);
   }
 }

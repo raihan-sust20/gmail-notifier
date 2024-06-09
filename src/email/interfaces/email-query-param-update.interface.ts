@@ -1,4 +1,4 @@
-export interface IEmailQueryParamDataToUpdate {  
+export interface IEmailQueryParamDataToUpdate {
   address?: string;
 
   name?: string;

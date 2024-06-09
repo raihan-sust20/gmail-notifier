@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryBuilder, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { DateTime } from 'luxon';
 import * as R from 'ramda';
 import { EmailQueryParam } from '../entities/email-query-param.entity';
