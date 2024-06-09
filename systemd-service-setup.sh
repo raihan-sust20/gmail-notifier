@@ -8,7 +8,7 @@ if [[ IS_ACTIVE == 'active' ]]; then
   echo "Stopped"
 fi;
 
-npm run build;
+# npm run build;
 
 WORKING_DIRECTORY=$(pwd);
 NODE_BIN_DIR=$(which node);

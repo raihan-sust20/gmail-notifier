@@ -23,7 +23,7 @@ export class EmailQueryParamRepositoryService {
     emailQueryParam.lastExecuted = DateTime.now().toJSDate();
 
     /**
-     * @todo Used just for test. Must be removed for production.
+     * @todo Used just for test. Must not be used for production.
      */
     // emailQueryParam.lastExecuted = DateTime.now()
     //   .minus({ months: 3 })
@@ -36,9 +36,10 @@ export class EmailQueryParamRepositoryService {
     dataToUpdate: IEmailQueryParamDataToUpdate,
     addressList: string[] | null,
   ) {
-    const addressListFromDb = await this.emailQueryParamRepository.find({
+    const addressesFromDb = await this.emailQueryParamRepository.find({
       select: { address: true },
     });
+    const addressListFromDb = R.pluck('address', addressesFromDb);
 
     this.emailQueryParamRepository
       .createQueryBuilder()

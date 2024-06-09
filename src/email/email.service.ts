@@ -251,11 +251,9 @@ export class EmailService {
       { lastExecuted: DateTime.now().toJSDate() },
       emailAddressList,
     );
-
-    // await BluebirdPromise.each(emailAddressList, this.)
   }
 
-  @Cron('*/2 * * * *')
+  @Cron('*/3 * * * *')
   async monitorEmail() {
     try {
       const gmailApiAuth = await authorize();
@@ -281,15 +279,10 @@ export class EmailService {
 
       this.sendDesktopNotification(filteredEmailMessagesMetadata);
 
-      // this.updateLastExecutionTimeInDb(groupedEmailMessagesMetadata);
-      this.emailQueryParamRepositoryService.updateEmailQueryParam(
+      await this.emailQueryParamRepositoryService.updateEmailQueryParam(
         { lastExecuted: DateTime.now().toJSDate() },
         null,
       );
-
-      /**
-       * @todo Update lastExecuted prop of EmailQueryParam entity
-       */
     } catch (error) {
       console.log('Whoops! Something went wrong.');
       console.log('[ERROR]:', error);
