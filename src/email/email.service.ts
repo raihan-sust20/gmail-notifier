@@ -7,6 +7,9 @@ import { DateTime, Duration } from 'luxon';
 import { google } from 'googleapis';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { cwd } from 'node:process';
+import {join} from 'node:path';
+import { rm } from 'node:fs/promises'
 import { authorize } from '../gmail-authz/gmail.auth';
 import { CreateEmailQueryParamDto } from './dto/create-email-query-param.dto';
 import { UpdateEmailQueryParamDto } from './dto/update-email-query-param.dto';
@@ -19,6 +22,7 @@ import {
 } from './interfaces/email-message-metadata.interface';
 import { IEmailMessageListItem } from './interfaces/email-message-list-item.interface';
 import { trace } from '../utils/fp';
+import { handleGoogleApiError } from '../utils/api.utils';
 
 @Injectable()
 export class EmailService {
@@ -50,7 +54,10 @@ export class EmailService {
     });
   }
 
-  async update(address: string, updateEmailQueryParamDto: UpdateEmailQueryParamDto) {
+  async update(
+    address: string,
+    updateEmailQueryParamDto: UpdateEmailQueryParamDto,
+  ) {
     return this.emailQueryParamRepositoryService.updateEmailQueryParam(
       updateEmailQueryParamDto,
       [address],
@@ -151,6 +158,9 @@ export class EmailService {
     return R.map(this.formatEmailQueryParamItem, emailQueryParamListFromDb);
   }
 
+  /**
+   * @todo Avoid using R.curry and arrow function.
+   */
   private listEmailMessagesMetadataForQueryParamItem = R.curry(
     async (
       self: EmailService,
@@ -296,7 +306,18 @@ export class EmailService {
       );
     } catch (error) {
       console.log('Whoops! Something went wrong.');
-      console.log('[ERROR]:', error);
+      const formatedError = handleGoogleApiError(error);
+      console.log('[ERROR]:', formatedError);
+
+      const errorMessage = R.path(['error', 'message'], formatedError);
+      const errorCode = R.path(['error', 'code'], formatedError);
+      if (R.equals('invalid_grant', errorMessage) && R.equals(400, errorCode)) {
+        const gmailApiAuthTokenPath = join(cwd(), 'auth/token.json');
+        
+        await rm(gmailApiAuthTokenPath);
+
+        console.log('Removed Gmail API auth token!');
+      }
     }
   }
 }

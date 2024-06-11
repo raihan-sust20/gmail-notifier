@@ -26,8 +26,8 @@ export class EmailController {
   }
 
   @Get('query-params/:address')
-  getEmailQueryParams(@Param('address') address: string) {
-    return this.emailServicService.getEmailQueryParams(address);
+  getEmailQueryParam(@Param('address') address: string) {
+    return this.emailServicService.getEmailQueryParam(address);
   }
 
   @Patch('query-params/:address')
