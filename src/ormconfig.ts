@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as dotenv from 'dotenv';
-import * as R from 'ramda';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 const env: any = dotenv.parse(fs.readFileSync('.env'));

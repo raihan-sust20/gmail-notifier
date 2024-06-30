@@ -33,9 +33,6 @@ export class EmailService {
     private emailQueryParamRepository: Repository<EmailQueryParam>,
   ) {}
 
-  /**
-   * @todo Bind 'this' to the class
-   */
   async create(createEmailQueryParamData: CreateEmailQueryParamDto) {
     return this.emailQueryParamRepositoryService.createEmailQueryParam(
       createEmailQueryParamData,
